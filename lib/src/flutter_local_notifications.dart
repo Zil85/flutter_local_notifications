@@ -3,7 +3,7 @@ part of flutter_local_notifications;
 typedef Future<dynamic> MessageHandler(String message);
 
 /// The available intervals for periodically showing notifications
-enum RepeatInterval { EveryMinute, Hourly, Daily, Weekly }
+enum RepeatInterval { EveryMinute, Hourly, Daily, Weekly, Custom }
 
 /// The days of the week
 class Day {
@@ -116,6 +116,25 @@ class FlutterLocalNotificationsPlugin {
       'title': title,
       'body': body,
       'millisecondsSinceEpoch': scheduledDate.millisecondsSinceEpoch,
+      'platformSpecifics': serializedPlatformSpecifics,
+      'payload': payload ?? ''
+    });
+  }
+
+  /// Periodically show a notification using the specified time interval.
+  /// For example, specifying a hourly interval means the first time the notification will be an hour after the method has been called and then every hour after that.
+  Future periodicallyTimeShow(int id, String title, String body,
+      Time notificationTime, NotificationDetails notificationDetails,
+      {String payload}) async {
+    var serializedPlatformSpecifics =
+    _retrievePlatformSpecificNotificationDetails(notificationDetails);
+    await _channel.invokeMethod('periodicallyShow', <String, dynamic>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'calledAt': new DateTime.now().millisecondsSinceEpoch,
+      'repeatTime': notificationTime.toMap(),
+      'repeatInterval': RepeatInterval.Custom.index,
       'platformSpecifics': serializedPlatformSpecifics,
       'payload': payload ?? ''
     });

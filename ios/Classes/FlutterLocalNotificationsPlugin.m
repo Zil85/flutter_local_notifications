@@ -53,7 +53,8 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
     EveryMinute,
     Hourly,
     Daily,
-    Weekly
+    Weekly,
+    Custom
 };
 
 
@@ -252,6 +253,7 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
             content.sound = [UNNotificationSound soundNamed:notificationDetails.sound];
         }
     }
+
     content.userInfo = [self buildUserDict:notificationDetails.id title:notificationDetails.title presentAlert:notificationDetails.presentAlert presentSound:notificationDetails.presentSound presentBadge:notificationDetails.presentBadge payload:notificationDetails.payload];
     if(notificationDetails.secondsSinceEpoch == nil) {
         NSTimeInterval timeInterval = 0.1;
@@ -270,10 +272,19 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
                 case Weekly:
                     timeInterval = 60 * 60 * 24 * 7;
                     break;
+                case Custom:
+                    if (notificationDetails.repeatTime != nil) {
+                        timeInterval = 60 * ([notificationDetails.repeatTime.hour integerValue] * 60 + [notificationDetails.repeatTime.minute integerValue]);
+                    }else{
+                        timeInterval = 60;
+                    }
+                    break;
             }
             repeats = YES;
-        }
-        if (notificationDetails.repeatTime != nil) {
+
+            trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeInterval
+                                                                                     repeats:repeats];
+        }else if (notificationDetails.repeatTime != nil) {
             NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierGregorian];
             NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
             [dateComponents setCalendar:calendar];
