@@ -274,9 +274,7 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
                     break;
                 case Custom:
                     if (notificationDetails.repeatTime != nil) {
-                        timeInterval = 60 * ([notificationDetails.repeatTime.hour integerValue] * 60 + [notificationDetails.repeatTime.minute integerValue]);
-                    }else{
-                        timeInterval = 60;
+                        timeInterval = 60 * ([notificationDetails.repeatTime.hour integerValue] * 60 + [notificationDetails.repeatTime.minute integerValue]) + [notificationDetails.repeatTime.second integerValue];
                     }
                     break;
             }
