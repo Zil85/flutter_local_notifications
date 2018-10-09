@@ -6,21 +6,30 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
 /// IMPORTANT: running the following code on its own won't work as there is setup required for each platform head project.
 /// Please download the complete example app from the GitHub repository where all the setup has been done
-void main() {
+void main() async {
+  flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+  // NOTE: if you want to find out if the app was launched via notification then you could use the following call and then do something like
+  // change the default route of the app
+  // var notificationAppLaunchDetails =
+  //     await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   runApp(
-    new MaterialApp(home: new MyApp()),
+    new MaterialApp(
+      home: HomePage(),
+    ),
   );
 }
 
-class MyApp extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _HomePageState createState() => new _HomePageState();
 }
 
-class _MyAppState extends State<MyApp> {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+class _HomePageState extends State<HomePage> {
   @override
   initState() {
     super.initState();
@@ -30,7 +39,6 @@ class _MyAppState extends State<MyApp> {
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         selectNotification: onSelectNotification);
   }
@@ -171,6 +179,26 @@ class _MyAppState extends State<MyApp> {
                           'Show notification with no badge, alert only once [Android]'),
                       onPressed: () async {
                         await _showNotificationWithNoBadge();
+                      },
+                    ),
+                  ),
+                  new Padding(
+                    padding: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
+                    child: new RaisedButton(
+                      child: new Text(
+                          'Show progress notification - updates every second [Android]'),
+                      onPressed: () async {
+                        await _showProgressNotification();
+                      },
+                    ),
+                  ),
+                  new Padding(
+                    padding: new EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 8.0),
+                    child: new RaisedButton(
+                      child: new Text(
+                          'Show indeterminate progress notification [Android]'),
+                      onPressed: () async {
+                        await _showIndeterminateProgressNotification();
                       },
                     ),
                   ),
@@ -460,6 +488,56 @@ class _MyAppState extends State<MyApp> {
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
         0, 'no badge title', 'no badge body', platformChannelSpecifics,
+        payload: 'item x');
+  }
+
+  Future _showProgressNotification() async {
+    var maxProgress = 5;
+    for (var i = 0; i <= maxProgress; i++) {
+      await Future.delayed(Duration(seconds: 1), () async {
+        var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+            'progress channel',
+            'progress channel',
+            'progress channel description',
+            channelShowBadge: false,
+            importance: Importance.Max,
+            priority: Priority.High,
+            onlyAlertOnce: true,
+            showProgress: true,
+            maxProgress: maxProgress,
+            progress: i);
+        var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+        var platformChannelSpecifics = new NotificationDetails(
+            androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+        await flutterLocalNotificationsPlugin.show(
+            0,
+            'progress notification title',
+            'progress notification body',
+            platformChannelSpecifics,
+            payload: 'item x');
+      });
+    }
+  }
+
+  Future _showIndeterminateProgressNotification() async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'indeterminate progress channel',
+        'indeterminate progress channel',
+        'indeterminate progress channel description',
+        channelShowBadge: false,
+        importance: Importance.Max,
+        priority: Priority.High,
+        onlyAlertOnce: true,
+        showProgress: true,
+        indeterminate: true);
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0,
+        'indeterminate progress notification title',
+        'indeterminate progress notification body',
+        platformChannelSpecifics,
         payload: 'item x');
   }
 
