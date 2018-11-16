@@ -161,9 +161,6 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
             notificationDetails.presentBadge = [[platformSpecifics objectForKey:PRESENT_BADGE] boolValue];
         }
         notificationDetails.sound = platformSpecifics[SOUND];
-        if(notificationDetails.presentBadge){
-            notificationDetails.badge = 1;
-        }
     }
     if([SCHEDULE_METHOD isEqualToString:call.method]) {
         notificationDetails.secondsSinceEpoch = @([call.arguments[MILLISECONDS_SINCE_EPOCH] integerValue] / 1000);
@@ -268,6 +265,10 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
             content.sound = [UNNotificationSound soundNamed:notificationDetails.sound];
         }
     }
+    
+    if(notificationDetails.presentBadge){
+        content.badge = 1;
+    }
 
     content.userInfo = [self buildUserDict:notificationDetails.id title:notificationDetails.title presentAlert:notificationDetails.presentAlert presentSound:notificationDetails.presentSound presentBadge:notificationDetails.presentBadge payload:notificationDetails.payload];
     if(notificationDetails.secondsSinceEpoch == nil) {
@@ -347,6 +348,10 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
         } else {
             notification.soundName = notificationDetails.sound;
         }
+    }
+    
+    if(notificationDetails.presentBadge) {
+        notification.applicationIconBadgeNumber = 1;
     }
     
     notification.userInfo = [self buildUserDict:notificationDetails.id title:notificationDetails.title presentAlert:notificationDetails.presentAlert presentSound:notificationDetails.presentSound presentBadge:notificationDetails.presentBadge payload:notificationDetails.payload];
