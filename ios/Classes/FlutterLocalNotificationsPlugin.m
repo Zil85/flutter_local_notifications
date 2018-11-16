@@ -267,7 +267,7 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
     }
     
     if(notificationDetails.presentBadge){
-        content.badge = 1;
+        content.badge = (NSNumber*)1;
     }
 
     content.userInfo = [self buildUserDict:notificationDetails.id title:notificationDetails.title presentAlert:notificationDetails.presentAlert presentSound:notificationDetails.presentSound presentBadge:notificationDetails.presentBadge payload:notificationDetails.payload];
