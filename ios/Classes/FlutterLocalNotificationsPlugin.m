@@ -161,6 +161,9 @@ typedef NS_ENUM(NSInteger, RepeatInterval) {
             notificationDetails.presentBadge = [[platformSpecifics objectForKey:PRESENT_BADGE] boolValue];
         }
         notificationDetails.sound = platformSpecifics[SOUND];
+        if(notificationDetails.presentBadge){
+            notificationDetails.badge = 1;
+        }
     }
     if([SCHEDULE_METHOD isEqualToString:call.method]) {
         notificationDetails.secondsSinceEpoch = @([call.arguments[MILLISECONDS_SINCE_EPOCH] integerValue] / 1000);
